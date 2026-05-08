@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Gym ABC</title>
+
   <style>
     :root {
       --bg: #000000;
@@ -64,6 +65,10 @@
       padding: 28px;
     }
 
+    .home-screen.hidden {
+      display: none;
+    }
+
     .home-inner {
       width: min(100%, 340px);
       display: grid;
@@ -98,10 +103,6 @@
 
     .workout-screen.active {
       display: block;
-    }
-
-    .home-screen.hidden {
-      display: none;
     }
 
     .topbar {
@@ -190,8 +191,15 @@
       transition: transform 220ms ease, opacity 180ms ease;
     }
 
-    .grid.anim-left-enter { transform: translateX(18px); opacity: 0; }
-    .grid.anim-right-enter { transform: translateX(-18px); opacity: 0; }
+    .grid.anim-left-enter {
+      transform: translateX(18px);
+      opacity: 0;
+    }
+
+    .grid.anim-right-enter {
+      transform: translateX(-18px);
+      opacity: 0;
+    }
 
     .exercise {
       position: relative;
@@ -353,6 +361,7 @@
     }
   </style>
 </head>
+
 <body>
   <main class="app" id="app" aria-live="polite">
     <section class="screen home-screen" id="homeScreen">
@@ -394,27 +403,31 @@
 
   <script>
     /*
-      HOW TO EDIT THIS SITE
+      IMAGE NAMING
 
-      Folder structure:
+      Put images here:
+
       images/a/aw1.jpg  images/a/aw2.jpg  ... images/a/aw8.jpg
       images/a/ap1.jpg  images/a/ap2.jpg  ... images/a/ap8.jpg
+
       images/b/bw1.jpg  images/b/bw2.jpg  ... images/b/bw8.jpg
       images/b/bp1.jpg  images/b/bp2.jpg  ... images/b/bp8.jpg
+
       images/c/cw1.jpg  images/c/cw2.jpg  ... images/c/cw8.jpg
       images/c/cp1.jpg  images/c/cp2.jpg  ... images/c/cp8.jpg
 
-      File extension fallback:
-      You can use .jpg, .png, .gif, .jpeg, .JPG, .PNG, .GIF, or .JPEG.
-      Keep the base name the same, for example:
-      images/a/aw1.png also works.
+      Allowed extensions:
+      .jpg, .png, .gif, .jpeg, .JPG, .PNG, .GIF, .JPEG
 
-      Sets and reps are separate, so editing is easy:
+      Keep the same base name. Example:
+      images/a/aw1.jpg
+      images/a/aw1.png
+      images/a/aw1.gif
+
+      Sets and reps are easy to edit:
       sets: 3, reps: "10"
       sets: 2, reps: "30s/side"
       sets: 1, reps: "2 min"
-
-      Keep exactly 8 exercises per section for the 2 × 4 grid.
     */
 
     const EXTENSIONS = ["jpg", "png", "gif", "jpeg", "JPG", "PNG", "GIF", "JPEG"];
@@ -534,7 +547,6 @@
 
       grid.className = `grid ${animationClass}`.trim();
       grid.innerHTML = exercises.map((exercise, index) => cardTemplate(exercise, index)).join("");
-      hydrateImages(grid);
 
       requestAnimationFrame(() => {
         grid.className = "grid";
@@ -544,7 +556,12 @@
     function cardTemplate(exercise, index) {
       return `
         <article class="exercise" data-index="${index}">
-          <div class="placeholder">${index + 1}</div>
+          <img
+            src="${exercise.file}.jpg"
+            alt="${exercise.name}"
+            loading="eager"
+            onerror="tryNextExtension(this, '${exercise.file}', 0, ${index + 1})"
+          >
           <div class="caption">
             <span class="name">${exercise.name}</span>
             <span class="meta">${formatDose(exercise)}</span>
@@ -553,32 +570,19 @@
       `;
     }
 
-    function hydrateImages(container) {
-      const cards = [...container.querySelectorAll(".exercise")];
-      cards.forEach((card) => {
-        const exercise = WORKOUTS[state.day][state.mode][Number(card.dataset.index)];
-        loadFlexibleImage(exercise.file, exercise.name, (img) => {
-          const oldMedia = card.querySelector("img, .placeholder");
-          oldMedia.replaceWith(img);
-        });
-      });
-    }
+    function tryNextExtension(img, fileBase, currentIndex, fallbackNumber) {
+      const nextIndex = currentIndex + 1;
 
-    function loadFlexibleImage(fileBase, alt, onSuccess) {
-      let attempt = 0;
-      const img = new Image();
-      img.alt = alt;
-      img.loading = "lazy";
+      if (nextIndex < EXTENSIONS.length) {
+        img.onerror = () => tryNextExtension(img, fileBase, nextIndex, fallbackNumber);
+        img.src = `${fileBase}.${EXTENSIONS[nextIndex]}`;
+        return;
+      }
 
-      img.onload = () => onSuccess(img);
-      img.onerror = () => {
-        attempt += 1;
-        if (attempt < EXTENSIONS.length) {
-          img.src = `${fileBase}.${EXTENSIONS[attempt]}`;
-        }
-      };
-
-      img.src = `${fileBase}.${EXTENSIONS[attempt]}`;
+      const placeholder = document.createElement("div");
+      placeholder.className = "placeholder";
+      placeholder.textContent = fallbackNumber;
+      img.replaceWith(placeholder);
     }
 
     function formatDose(exercise) {
@@ -607,10 +611,6 @@
       render(direction === "left" ? "anim-left-enter" : "anim-right-enter");
     }
 
-    function toggleMode(direction = "left") {
-      setMode(state.mode === "workout" ? "posture" : "workout", direction);
-    }
-
     homeDayButtons.forEach((button) => {
       button.addEventListener("click", () => chooseDay(Number(button.dataset.day)));
     });
@@ -634,11 +634,13 @@
     function openModal(exercise, fallbackNumber) {
       modalTitle.textContent = exercise.name;
       modalMeta.textContent = `${formatDose(exercise)}${exercise.notes ? " · " + exercise.notes : ""}`;
-      modalMedia.innerHTML = `<div class="placeholder">${fallbackNumber}</div>`;
-      loadFlexibleImage(exercise.file, exercise.name, (img) => {
-        modalMedia.innerHTML = "";
-        modalMedia.appendChild(img);
-      });
+      modalMedia.innerHTML = `
+        <img
+          src="${exercise.file}.jpg"
+          alt="${exercise.name}"
+          onerror="tryNextExtension(this, '${exercise.file}', 0, ${fallbackNumber})"
+        >
+      `;
       modal.classList.add("open");
     }
 
@@ -647,6 +649,7 @@
     }
 
     closeModal.addEventListener("click", closeModalNow);
+
     modal.addEventListener("click", (event) => {
       if (event.target === modal) closeModalNow();
     });
@@ -673,6 +676,7 @@
 
       const minDistance = 46;
       const maxTime = 700;
+
       if (elapsed > maxTime) return;
 
       if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > minDistance) {
@@ -684,7 +688,9 @@
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeModalNow();
       if (event.key === "Home") showHome();
+
       if (state.screen !== "workout") return;
+
       if (event.key === "ArrowRight") setMode("posture", "left");
       if (event.key === "ArrowLeft") setMode("workout", "right");
     });

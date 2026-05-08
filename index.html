@@ -70,7 +70,7 @@
     }
 
     .home-inner {
-      width: min(100%, 340px);
+      width: min(100%, 380px);
       display: grid;
       gap: 12px;
     }
@@ -87,7 +87,7 @@
 
     .home-day {
       width: 100%;
-      height: 76px;
+      height: 62px;
       border: 1px solid var(--line);
       background: #000000;
       color: #ffffff;
@@ -242,14 +242,14 @@
       left: 0;
       right: 0;
       bottom: 0;
-      padding: 6px 7px 7px;
-      background: rgba(0, 0, 0, 0.62);
+      padding: 14px 12px 16px;
+      background: rgba(0, 0, 0, 0.68);
       z-index: 2;
     }
 
     .name {
       display: block;
-      font-size: 12px;
+      font-size: 36px;
       line-height: 1.05;
       font-weight: 800;
       letter-spacing: -0.02em;
@@ -258,11 +258,19 @@
 
     .meta {
       display: block;
-      margin-top: 3px;
-      color: rgba(255,255,255,0.68);
-      font-size: 10px;
+      margin-top: 6px;
+      color: rgba(255,255,255,0.82);
+      font-size: 30px;
       line-height: 1;
       font-weight: 700;
+    }
+
+    .config-help {
+      margin: 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.25;
+      text-align: center;
     }
 
     .hint {
@@ -370,14 +378,7 @@
         <button class="home-day" data-day="0" type="button">A</button>
         <button class="home-day" data-day="1" type="button">B</button>
         <button class="home-day" data-day="2" type="button">C</button>
-      </div>
-    </section>
-
-    <section class="screen workout-screen" id="workoutScreen">
-      <header class="topbar">
-        <button class="home-button" id="homeButton" type="button" aria-label="Back to day selector">⌂</button>
-        <div class="mode-switcher" aria-label="Choose type">
-          <button class="mode-btn active" data-mode="workout" type="button">Gym</button>
+        <p class="config-help">Edit workouts.txt on GitHub to change names, sets and reps.</p>ton class="mode-btn active" data-mode="workout" type="button">Gym</button>
           <button class="mode-btn" data-mode="posture" type="button">Posture</button>
         </div>
         <div class="day-mark" id="dayMark">A</div>
@@ -526,6 +527,53 @@
     const modalTitle = document.getElementById("modalTitle");
     const modalMeta = document.getElementById("modalMeta");
     const closeModal = document.getElementById("closeModal");
+    const configPad = document.getElementById("configPad");
+    const applyConfig = document.getElementById("applyConfig");
+    const resetConfig = document.getElementById("resetConfig");
+
+    function buildConfigText() {
+      const lines = [];
+     const closeModal = document.getElementById("closeModal");.title} / ${index + 1} / ${exercise.name} / sets:${exercise.sets} / reps:${exercise.reps}`);
+          });
+        });
+      });
+      return lines.join("
+");
+    }
+
+    function applyConfigText(text) {
+      text.split("
+").forEach((rawLine) => {
+        const line = rawLine.trim();
+        if (!line || line.startsWith("#")) return;
+
+        const parts = line.split("/").map(part => part.trim());
+        if (parts.length < 6) return;
+
+        const mode = parts[0].toLowerCase().includes("posture") ? "posture" : "workout";
+        const dayMatch = parts[1].match(/[ABC]/i);
+        const dayIndex = dayMatch ? "abc".indexOf(dayMatch[0].toLowerCase()) : -1;
+        const exerciseIndex = Number.parseInt(parts[2], 10) - 1;
+        const name = parts[3];
+
+        if (!WORKOUTS[dayIndex] || !WORKOUTS[dayIndex][mode][exerciseIndex]) return;
+
+        const exercise = WORKOUTS[dayIndex][mode][exerciseIndex];
+        exercise.name = name;
+
+        parts.slice(4).forEach((field) => {
+          const [key, ...valueParts] = field.split(":");
+          const keyClean = key.trim().toLowerCase();
+          const value = valueParts.join(":").trim();
+          if (keyClean === "sets") exercise.sets = Number.isNaN(Number(value)) ? value : Number(value);
+          if (keyClean === "reps") exercise.reps = value;
+          if (keyClean === "notes") exercise.notes = value;
+        });
+      });
+
+      localStorage.setItem("gymConfigText", text);
+      render();
+    }
 
     function render(animationClass = "") {
       if (state.screen === "home") {
@@ -534,10 +582,23 @@
         return;
       }
 
-      homeScreen.classList.add("hidden");
-      workoutScreen.classList.add("active");
+      homeScreen.classList.add("h      render();
+    }
 
-      const currentDay = WORKOUTS[state.day];
+    async function loadWorkoutTextFile() {
+      try {
+        const response = await fetch(`workouts.txt?v=${Date.now()}`);
+        if (!response.ok) {
+          render();
+          return;
+        }
+
+        const text = await response.text();
+        applyConfigText(text);
+      } catch (error) {
+        render();
+      }
+    }ntDay = WORKOUTS[state.day];
       const exercises = currentDay[state.mode];
       dayMark.textContent = currentDay.title;
 
@@ -617,15 +678,17 @@
 
     homeButton.addEventListener("click", showHome);
 
-    modeButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        setMode(button.dataset.mode, button.dataset.mode === "posture" ? "left" : "right");
-      });
+    applyConfig.addEventListener("click", () => {
+      applyConfigText(configPad.value);
     });
 
-    grid.addEventListener("click", (event) => {
-      const card = event.target.closest(".exercise");
-      if (!card) return;
+    resetConfig.addEventListener("click", () => {
+      localStorage.removeItem("gymConfigText");
+      configPad.value = buildConfigText();
+      applyConfigText(configPad.value);
+    });
+
+    modeButtons.for(!card) return;
 
       const exercise = WORKOUTS[state.day][state.mode][Number(card.dataset.index)];
       openModal(exercise, Number(card.dataset.index) + 1);
@@ -695,7 +758,9 @@
       if (event.key === "ArrowLeft") setMode("workout", "right");
     });
 
-    render();
+    configPad.value = localStorage.getItem("gymConfigText") || buildConfigText();
+    applyConfigText(configPad.value);
   </script>
 </body>
 </html>
+loadWorkoutTextFile();

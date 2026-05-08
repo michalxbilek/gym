@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Gym ABC</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --panel: #151518;
+      --panel-soft: #1d1d21;
+      --text: #f4f4f5;
+      --muted: #8f8f98;
+      --line: #29292f;
+      --accent: #ffffff;
+      --radius: 0px;
+      --topbar-h: 56px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overscroll-behavior: none;
+      touch-action: pan-y;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    .app {
+      position: relative;
+      width: 100vw;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    }
+
+    .topbar {
+      height: var(--topbar-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(11, 11, 12, 0.96);
+      backdrop-filter: blur(16px);
+      z-index: 5;
+    }
+
+
+    .viewport {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .grid {
+      --tile-size: min(50vw, calc((100dvh - var(--topbar-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom)) / 4));
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(2, var(--tile-size));
+      grid-template-rows: repeat(4, var(--tile-size));
+      gap: 0;
+      padding: 0;
+      justify-content: center;
+      align-content: start;
+      transition: transform 220ms ease, opacity 180ms ease;
+    }
+
+    .grid.anim-left-enter { transform: translateX(18px); opacity: 0; }
+    .grid.anim-right-enter { transform: translateX(-18px); opacity: 0; }
+    .grid.anim-up-enter { transform: translateY(18px); opacity: 0; }
+    .grid.anim-down-enter { transform: translateY(-18px); opacity: 0; }
+
+    .exercise {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      border-radius: 0;
+      background: var(--panel);
+      border: 0;
+      min-height: 0;
+      isolation: isolate;
+    }
+
+    .exercise:active {
+      transform: scale(0.985);
+    }
+
+    .exercise img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: var(--panel-soft);
+    }
+
+    .placeholder {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      background: var(--panel-soft);
+      color: #5f5f68;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 6px 7px 7px;
+      background: rgba(0, 0, 0, 0.62);
+      z-index: 2;
+    }
+
+    .name {
+      display: block;
+      font-size: 12px;
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+
+    .meta {
+      display: block;
+      margin-top: 3px;
+      color: rgba(255,255,255,0.68);
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .day-switcher,
+    .mode-switcher {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(21, 21, 24, 0.9);
+      border: 1px solid var(--line);
+    }
+
+    .day-btn,
+    .mode-btn {
+      height: 34px;
+      min-width: 34px;
+      padding: 0 11px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .mode-btn {
+      min-width: 64px;
+      font-size: 12px;
+    }
+
+    .day-btn.active,
+    .mode-btn.active {
+      background: var(--text);
+      color: #0b0b0c;
+    }
+
+    .hint {
+      position: absolute;
+      left: 50%;
+      bottom: calc(env(safe-area-inset-bottom) + 8px);
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.42);
+      font-size: 10px;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+      z-index: 4;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      animation: hintFade 4s ease forwards;
+    }
+
+    @keyframes hintFade {
+      0%, 15% { opacity: 0; }
+      30%, 70% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,0.88);
+      z-index: 20;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(100%, 430px);
+    }
+
+    .modal-media {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 0;
+      background: var(--panel-soft);
+      border: 0;
+    }
+
+    .modal-media img,
+    .modal-media .placeholder {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-info {
+      padding: 14px 2px 0;
+    }
+
+    .modal-info h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .modal-info p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .close {
+      position: fixed;
+      top: calc(env(safe-area-inset-top) + 12px);
+      right: 14px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    @media (min-width: 560px) {
+      body {
+        background: #050506;
+      }
+
+      .app {
+        width: 430px;
+        margin: 0 auto;
+        border-left: 1px solid var(--line);
+        border-right: 1px solid var(--line);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app" aria-live="polite">
+    <header class="topbar">
+      <div class="day-switcher" aria-label="Choose day">
+        <button class="day-btn active" data-day="0" type="button">A</button>
+        <button class="day-btn" data-day="1" type="button">B</button>
+        <button class="day-btn" data-day="2" type="button">C</button>
+      </div>
+      <div class="mode-switcher" aria-label="Choose type">
+        <button class="mode-btn active" data-mode="workout" type="button">Gym</button>
+        <button class="mode-btn" data-mode="posture" type="button">Posture</button>
+      </div>
+    </header>
+
+    <section class="viewport" id="viewport">
+      <div class="grid" id="grid"></div>
+      <div class="hint">swipe ← → for A/B/C · swipe ↑ ↓ for workout/posture</div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="close" id="closeModal" type="button" aria-label="Close">×</button>
+    <div class="modal-card">
+      <div class="modal-media" id="modalMedia"></div>
+      <div class="modal-info">
+        <h2 id="modalTitle"></h2>
+        <p id="modalMeta"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*
+      HOW TO EDIT THIS SITE
+      1. Put your square images into folders, for example:
+         images/a/workout/push-up.jpg
+         images/a/posture/wall-angels.jpg
+
+      2. Replace the img paths below.
+         Leave img empty, like img: "", if you want a placeholder.
+
+      3. Sets and reps are separate, so editing is easy:
+         sets: 3, reps: "10"
+         sets: 2, reps: "30s/side"
+         sets: 1, reps: "2 min"
+
+      4. Keep exactly 8 exercises per section if you want the clean 2 × 4 grid.
+    */
+
+    const WORKOUTS = [
+      {
+        id: "a",
+        title: "Day A",
+        workout: [
+          { name: "Goblet Squat", img: "images/a/workout/goblet-squat.jpg", sets: 3, reps: "10", notes: "Slow down, knees track toes" },
+          { name: "Romanian Deadlift", img: "images/a/workout/rdl.jpg", sets: 3, reps: "10", notes: "Hips back, neutral back" },
+          { name: "Floor Press", img: "images/a/workout/floor-press.jpg", sets: 3, reps: "10", notes: "Elbows 45°" },
+          { name: "Bent-over Row", img: "images/a/workout/row.jpg", sets: 3, reps: "10", notes: "Pull to ribs" },
+          { name: "Reverse Lunge", img: "images/a/workout/reverse-lunge.jpg", sets: 3, reps: "8/side", notes: "Tall torso" },
+          { name: "Shoulder Press", img: "images/a/workout/shoulder-press.jpg", sets: 3, reps: "10", notes: "Ribs down" },
+          { name: "Glute Bridge", img: "images/a/workout/glute-bridge.jpg", sets: 3, reps: "12", notes: "Squeeze at top" },
+          { name: "Plank Hold", img: "images/a/workout/plank.jpg", sets: 3, reps: "30s", notes: "Long neck, tight core" }
+        ],
+        posture: [
+          { name: "Wall Angels", img: "", sets: 2, reps: "10", notes: "Back against wall" },
+          { name: "Chin Tucks", img: "", sets: 2, reps: "10", notes: "Tiny double chin" },
+          { name: "Thoracic Extension", img: "", sets: 2, reps: "8", notes: "Upper back only" },
+          { name: "Doorway Pec Stretch", img: "", sets: 2, reps: "30s", notes: "Gentle chest opening" },
+          { name: "Cat Cow", img: "", sets: 2, reps: "8", notes: "Move one vertebra at a time" },
+          { name: "Hip Flexor Stretch", img: "", sets: 2, reps: "30s/side", notes: "Tuck pelvis slightly" },
+          { name: "Dead Bug", img: "", sets: 2, reps: "8/side", notes: "Lower back stays down" },
+          { name: "Scapular Push-up", img: "", sets: 2, reps: "10", notes: "Move shoulder blades" }
+        ]
+      },
+      {
+        id: "b",
+        title: "Day B",
+        workout: [
+          { name: "Push-up", img: "images/b/workout/push-up.jpg", sets: 3, reps: "AMRAP", notes: "Clean reps only" },
+          { name: "TRX Row", img: "images/b/workout/trx-row.jpg", sets: 3, reps: "10", notes: "Body straight" },
+          { name: "Jump Squat", img: "images/b/workout/jump-squat.jpg", sets: 3, reps: "8", notes: "Land quiet" },
+          { name: "Renegade Row", img: "images/b/workout/renegade-row.jpg", sets: 3, reps: "8/side", notes: "Hips steady" },
+          { name: "Calf Raise", img: "images/b/workout/calf-raise.jpg", sets: 3, reps: "15", notes: "Full range" },
+          { name: "Lateral Raise", img: "images/b/workout/lateral-raise.jpg", sets: 3, reps: "12", notes: "Soft elbows" },
+          { name: "Mountain Climber", img: "images/b/workout/mountain-climber.jpg", sets: 3, reps: "30s", notes: "Shoulders over wrists" },
+          { name: "Burpee", img: "images/b/workout/burpee.jpg", sets: 3, reps: "6", notes: "Controlled, not chaotic" }
+        ],
+        posture: [
+          { name: "Band Pull-apart", img: "", sets: 2, reps: "12", notes: "Shoulders down" },
+          { name: "Face Pull", img: "", sets: 2, reps: "12", notes: "Pull toward eyes" },
+          { name: "Wall Slides", img: "", sets: 2, reps: "10", notes: "No rib flare" },
+          { name: "Child's Pose Reach", img: "", sets: 2, reps: "30s", notes: "Reach long" },
+          { name: "90/90 Hip Switch", img: "", sets: 2, reps: "8", notes: "Move slow" },
+          { name: "Couch Stretch", img: "", sets: 2, reps: "30s/side", notes: "Glute squeezed" },
+          { name: "Bird Dog", img: "", sets: 2, reps: "8/side", notes: "No twisting" },
+          { name: "Neck CARs", img: "", sets: 2, reps: "5", notes: "Small smooth circles" }
+        ]
+      },
+      {
+        id: "c",
+        title: "Day C",
+        workout: [
+          { name: "Dumbbell Swing", img: "images/c/workout/swing.jpg", sets: 3, reps: "12", notes: "Hip hinge, not squat" },
+          { name: "Squat to Press", img: "images/c/workout/squat-to-press.jpg", sets: 3, reps: "10", notes: "Smooth drive up" },
+          { name: "TRX Fallout", img: "images/c/workout/trx-fallout.jpg", sets: 3, reps: "8", notes: "Abs locked" },
+          { name: "Single-leg Squat Assist", img: "images/c/workout/single-leg-squat.jpg", sets: 3, reps: "8/side", notes: "Use TRX lightly" },
+          { name: "Sumo Squat", img: "images/c/workout/sumo-squat.jpg", sets: 3, reps: "10", notes: "Knees out" },
+          { name: "TRX Face Pull", img: "images/c/workout/trx-face-pull.jpg", sets: 3, reps: "12", notes: "Elbows high" },
+          { name: "TRX Mountain Climber", img: "images/c/workout/trx-mountain-climber.jpg", sets: 3, reps: "30s", notes: "Slow and sharp" },
+          { name: "Tricep Dip", img: "images/c/workout/tricep-dip.jpg", sets: 3, reps: "8", notes: "Shoulders away from ears" }
+        ],
+        posture: [
+          { name: "Open Book", img: "", sets: 2, reps: "8/side", notes: "Rotate upper back" },
+          { name: "Thread the Needle", img: "", sets: 2, reps: "8/side", notes: "Breathe into stretch" },
+          { name: "Prone Y Raise", img: "", sets: 2, reps: "10", notes: "Thumbs up" },
+          { name: "Prone W Raise", img: "", sets: 2, reps: "10", notes: "Squeeze shoulder blades" },
+          { name: "Hamstring Floss", img: "", sets: 2, reps: "10/side", notes: "Gentle movement" },
+          { name: "Ankle Rocks", img: "", sets: 2, reps: "10/side", notes: "Heel stays down" },
+          { name: "Side Plank", img: "", sets: 2, reps: "20s/side", notes: "Straight line" },
+          { name: "Breathing Reset", img: "", sets: 1, reps: "2 min", notes: "Slow nasal breathing" }
+        ]
+      }
+    ];
+
+    const state = {
+      day: 0,
+      mode: "workout"
+    };
+
+    const app = document.getElementById("app");
+    const grid = document.getElementById("grid");
+    const dayButtons = [...document.querySelectorAll(".day-btn")];
+    const modeButtons = [...document.querySelectorAll(".mode-btn")];
+    const modal = document.getElementById("modal");
+    const modalMedia = document.getElementById("modalMedia");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalMeta = document.getElementById("modalMeta");
+    const closeModal = document.getElementById("closeModal");
+
+    function render(animationClass = "") {
+      const currentDay = WORKOUTS[state.day];
+      const exercises = currentDay[state.mode];
+      dayButtons.forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.day) === state.day);
+      });
+
+      modeButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.mode === state.mode);
+      });
+
+      grid.className = `grid ${animationClass}`.trim();
+      grid.innerHTML = exercises.map((exercise, index) => cardTemplate(exercise, index)).join("");
+
+      requestAnimationFrame(() => {
+        grid.className = "grid";
+      });
+    }
+
+    function cardTemplate(exercise, index) {
+      const media = exercise.img
+        ? `<img src="${exercise.img}" alt="${exercise.name}" loading="lazy" onerror="this.replaceWith(makePlaceholder(${index + 1}))">`
+        : `<div class="placeholder">${index + 1}</div>`;
+
+      return `
+        <article class="exercise" data-index="${index}">
+          ${media}
+          <div class="caption">
+            <span class="name">${exercise.name}</span>
+            <span class="meta">${formatDose(exercise)}</span>
+          </div>
+        </article>
+      `;
+    }
+
+    function formatDose(exercise) {
+      if (!exercise.sets && !exercise.reps) return "";
+      if (!exercise.sets) return exercise.reps;
+      if (!exercise.reps) return `${exercise.sets} sets`;
+      return `${exercise.sets}×${exercise.reps}`;
+    }
+
+    function makePlaceholder(number) {
+      const div = document.createElement("div");
+      div.className = "placeholder";
+      div.textContent = number;
+      return div;
+    }
+
+    function setDay(nextDay, direction) {
+      const normalized = (nextDay + WORKOUTS.length) % WORKOUTS.length;
+      if (normalized === state.day) return;
+      const movingForward = direction || normalized > state.day;
+      state.day = normalized;
+      render(movingForward ? "anim-left-enter" : "anim-right-enter");
+    }
+
+    function setMode(nextMode, direction) {
+      if (nextMode === state.mode) return;
+      state.mode = nextMode;
+      render(direction === "up" ? "anim-up-enter" : "anim-down-enter");
+    }
+
+    function toggleMode() {
+      setMode(state.mode === "workout" ? "posture" : "workout", state.mode === "workout" ? "up" : "down");
+    }
+
+    dayButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        setDay(Number(button.dataset.day));
+      });
+    });
+
+    modeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        setMode(button.dataset.mode, button.dataset.mode === "posture" ? "up" : "down");
+      });
+    });
+
+
+    grid.addEventListener("click", (event) => {
+      const card = event.target.closest(".exercise");
+      if (!card) return;
+
+      const exercise = WORKOUTS[state.day][state.mode][Number(card.dataset.index)];
+      openModal(exercise, Number(card.dataset.index) + 1);
+    });
+
+    function openModal(exercise, fallbackNumber) {
+      modalTitle.textContent = exercise.name;
+      modalMeta.textContent = `${formatDose(exercise)}${exercise.notes ? " · " + exercise.notes : ""}`;
+      modalMedia.innerHTML = exercise.img
+        ? `<img src="${exercise.img}" alt="${exercise.name}" onerror="this.replaceWith(makePlaceholder(${fallbackNumber}))">`
+        : `<div class="placeholder">${fallbackNumber}</div>`;
+      modal.classList.add("open");
+    }
+
+    function closeModalNow() {
+      modal.classList.remove("open");
+    }
+
+    closeModal.addEventListener("click", closeModalNow);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeModalNow();
+    });
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+
+    app.addEventListener("touchstart", (event) => {
+      const touch = event.changedTouches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      touchStartTime = Date.now();
+    }, { passive: true });
+
+    app.addEventListener("touchend", (event) => {
+      if (modal.classList.contains("open")) return;
+
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      const elapsed = Date.now() - touchStartTime;
+
+      const minDistance = 46;
+      const maxTime = 700;
+      if (elapsed > maxTime) return;
+
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > minDistance) {
+        if (dx < 0) setDay(state.day + 1, true);
+        else setDay(state.day - 1, false);
+      }
+
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > minDistance) {
+        if (dy < 0) setMode("posture", "up");
+        else setMode("workout", "down");
+      }
+    }, { passive: true });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeModalNow();
+      if (event.key === "ArrowRight") setDay(state.day + 1, true);
+      if (event.key === "ArrowLeft") setDay(state.day - 1, false);
+      if (event.key === "ArrowUp") setMode("posture", "up");
+      if (event.key === "ArrowDown") setMode("workout", "down");
+    });
+
+    render();
+  </script>
+</body>
+</html>

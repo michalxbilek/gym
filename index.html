@@ -87,7 +87,7 @@
 
     .home-day {
       width: 100%;
-      height: 62px;
+      height: 76px;
       border: 1px solid var(--line);
       background: #000000;
       color: #ffffff;
@@ -95,6 +95,14 @@
       line-height: 1;
       font-weight: 900;
       letter-spacing: -0.05em;
+    }
+
+    .config-help {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+      text-align: center;
     }
 
     .workout-screen {
@@ -249,28 +257,21 @@
 
     .name {
       display: block;
-      font-size: 36px;
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-size: clamp(22px, 6.5vw, 36px);
+      line-height: 0.95;
+      font-weight: 850;
+      letter-spacing: -0.05em;
       text-wrap: balance;
     }
 
     .meta {
       display: block;
-      margin-top: 6px;
+      margin-top: 8px;
       color: rgba(255,255,255,0.82);
-      font-size: 30px;
+      font-size: clamp(18px, 5.2vw, 30px);
       line-height: 1;
-      font-weight: 700;
-    }
-
-    .config-help {
-      margin: 0;
-      color: var(--muted);
-      font-size: 10px;
-      line-height: 1.25;
-      text-align: center;
+      font-weight: 800;
+      letter-spacing: -0.03em;
     }
 
     .hint {
@@ -378,7 +379,15 @@
         <button class="home-day" data-day="0" type="button">A</button>
         <button class="home-day" data-day="1" type="button">B</button>
         <button class="home-day" data-day="2" type="button">C</button>
-        <p class="config-help">Edit workouts.txt on GitHub to change names, sets and reps.</p>ton class="mode-btn active" data-mode="workout" type="button">Gym</button>
+        <p class="config-help">Edit workouts.txt on GitHub to change names, sets and reps.</p>
+      </div>
+    </section>
+
+    <section class="screen workout-screen" id="workoutScreen">
+      <header class="topbar">
+        <button class="home-button" id="homeButton" type="button" aria-label="Back to day selector">⌂</button>
+        <div class="mode-switcher" aria-label="Choose type">
+          <button class="mode-btn active" data-mode="workout" type="button">Gym</button>
           <button class="mode-btn" data-mode="posture" type="button">Posture</button>
         </div>
         <div class="day-mark" id="dayMark">A</div>
@@ -403,34 +412,6 @@
   </div>
 
   <script>
-    /*
-      IMAGE NAMING
-
-      Put images here:
-
-      images/a/aw1.jpg  images/a/aw2.jpg  ... images/a/aw8.jpg
-      images/a/ap1.jpg  images/a/ap2.jpg  ... images/a/ap8.jpg
-
-      images/b/bw1.jpg  images/b/bw2.jpg  ... images/b/bw8.jpg
-      images/b/bp1.jpg  images/b/bp2.jpg  ... images/b/bp8.jpg
-
-      images/c/cw1.jpg  images/c/cw2.jpg  ... images/c/cw8.jpg
-      images/c/cp1.jpg  images/c/cp2.jpg  ... images/c/cp8.jpg
-
-      Allowed extensions:
-      .jpg, .png, .gif, .jpeg, .JPG, .PNG, .GIF, .JPEG
-
-      Keep the same base name. Example:
-      images/a/aw1.jpg
-      images/a/aw1.png
-      images/a/aw1.gif
-
-      Sets and reps are easy to edit:
-      sets: 3, reps: "10"
-      sets: 2, reps: "30s/side"
-      sets: 1, reps: "2 min"
-    */
-
     const EXTENSIONS = ["jpg", "png", "gif", "jpeg", "JPG", "PNG", "GIF", "JPEG"];
 
     const WORKOUTS = [
@@ -527,53 +508,6 @@
     const modalTitle = document.getElementById("modalTitle");
     const modalMeta = document.getElementById("modalMeta");
     const closeModal = document.getElementById("closeModal");
-    const configPad = document.getElementById("configPad");
-    const applyConfig = document.getElementById("applyConfig");
-    const resetConfig = document.getElementById("resetConfig");
-
-    function buildConfigText() {
-      const lines = [];
-     const closeModal = document.getElementById("closeModal");.title} / ${index + 1} / ${exercise.name} / sets:${exercise.sets} / reps:${exercise.reps}`);
-          });
-        });
-      });
-      return lines.join("
-");
-    }
-
-    function applyConfigText(text) {
-      text.split("
-").forEach((rawLine) => {
-        const line = rawLine.trim();
-        if (!line || line.startsWith("#")) return;
-
-        const parts = line.split("/").map(part => part.trim());
-        if (parts.length < 6) return;
-
-        const mode = parts[0].toLowerCase().includes("posture") ? "posture" : "workout";
-        const dayMatch = parts[1].match(/[ABC]/i);
-        const dayIndex = dayMatch ? "abc".indexOf(dayMatch[0].toLowerCase()) : -1;
-        const exerciseIndex = Number.parseInt(parts[2], 10) - 1;
-        const name = parts[3];
-
-        if (!WORKOUTS[dayIndex] || !WORKOUTS[dayIndex][mode][exerciseIndex]) return;
-
-        const exercise = WORKOUTS[dayIndex][mode][exerciseIndex];
-        exercise.name = name;
-
-        parts.slice(4).forEach((field) => {
-          const [key, ...valueParts] = field.split(":");
-          const keyClean = key.trim().toLowerCase();
-          const value = valueParts.join(":").trim();
-          if (keyClean === "sets") exercise.sets = Number.isNaN(Number(value)) ? value : Number(value);
-          if (keyClean === "reps") exercise.reps = value;
-          if (keyClean === "notes") exercise.notes = value;
-        });
-      });
-
-      localStorage.setItem("gymConfigText", text);
-      render();
-    }
 
     function render(animationClass = "") {
       if (state.screen === "home") {
@@ -582,23 +516,10 @@
         return;
       }
 
-      homeScreen.classList.add("h      render();
-    }
+      homeScreen.classList.add("hidden");
+      workoutScreen.classList.add("active");
 
-    async function loadWorkoutTextFile() {
-      try {
-        const response = await fetch(`workouts.txt?v=${Date.now()}`);
-        if (!response.ok) {
-          render();
-          return;
-        }
-
-        const text = await response.text();
-        applyConfigText(text);
-      } catch (error) {
-        render();
-      }
-    }ntDay = WORKOUTS[state.day];
+      const currentDay = WORKOUTS[state.day];
       const exercises = currentDay[state.mode];
       dayMark.textContent = currentDay.title;
 
@@ -619,13 +540,13 @@
         <article class="exercise" data-index="${index}">
           <img
             src="${exercise.file}.jpg"
-            alt="${exercise.name}"
+            alt="${escapeHtml(exercise.name)}"
             loading="eager"
             onerror="tryNextExtension(this, '${exercise.file}', 0, ${index + 1})"
           >
           <div class="caption">
-            <span class="name">${exercise.name}</span>
-            <span class="meta">${formatDose(exercise)}</span>
+            <span class="name">${escapeHtml(exercise.name)}</span>
+            <span class="meta">${escapeHtml(formatDose(exercise))}</span>
           </div>
         </article>
       `;
@@ -653,6 +574,57 @@
       return `${exercise.sets}×${exercise.reps}`;
     }
 
+    function applyConfigText(text) {
+      text.split("
+").forEach((rawLine) => {
+        const line = rawLine.trim();
+        if (!line || line.startsWith("#")) return;
+
+        const parts = line.split("/").map((part) => part.trim());
+        if (parts.length < 6) return;
+
+        const mode = parts[0].toLowerCase().includes("posture") ? "posture" : "workout";
+        const dayMatch = parts[1].match(/[ABC]/i);
+        const dayIndex = dayMatch ? "abc".indexOf(dayMatch[0].toLowerCase()) : -1;
+        const exerciseIndex = Number.parseInt(parts[2], 10) - 1;
+        const name = parts[3];
+
+        if (!WORKOUTS[dayIndex] || !WORKOUTS[dayIndex][mode] || !WORKOUTS[dayIndex][mode][exerciseIndex]) return;
+
+        const exercise = WORKOUTS[dayIndex][mode][exerciseIndex];
+        exercise.name = name;
+
+        parts.slice(4).forEach((field) => {
+          const [key, ...valueParts] = field.split(":");
+          if (!key || valueParts.length === 0) return;
+
+          const keyClean = key.trim().toLowerCase();
+          const value = valueParts.join(":").trim();
+
+          if (keyClean === "sets") exercise.sets = Number.isNaN(Number(value)) ? value : Number(value);
+          if (keyClean === "reps") exercise.reps = value;
+          if (keyClean === "notes") exercise.notes = value;
+        });
+      });
+
+      render();
+    }
+
+    async function loadWorkoutTextFile() {
+      try {
+        const response = await fetch(`workouts.txt?v=${Date.now()}`);
+        if (!response.ok) {
+          render();
+          return;
+        }
+
+        const text = await response.text();
+        applyConfigText(text);
+      } catch (error) {
+        render();
+      }
+    }
+
     function showHome() {
       state.screen = "home";
       closeModalNow();
@@ -672,35 +644,13 @@
       render(direction === "left" ? "anim-left-enter" : "anim-right-enter");
     }
 
-    homeDayButtons.forEach((button) => {
-      button.addEventListener("click", () => chooseDay(Number(button.dataset.day)));
-    });
-
-    homeButton.addEventListener("click", showHome);
-
-    applyConfig.addEventListener("click", () => {
-      applyConfigText(configPad.value);
-    });
-
-    resetConfig.addEventListener("click", () => {
-      localStorage.removeItem("gymConfigText");
-      configPad.value = buildConfigText();
-      applyConfigText(configPad.value);
-    });
-
-    modeButtons.for(!card) return;
-
-      const exercise = WORKOUTS[state.day][state.mode][Number(card.dataset.index)];
-      openModal(exercise, Number(card.dataset.index) + 1);
-    });
-
     function openModal(exercise, fallbackNumber) {
       modalTitle.textContent = exercise.name;
       modalMeta.textContent = `${formatDose(exercise)}${exercise.notes ? " · " + exercise.notes : ""}`;
       modalMedia.innerHTML = `
         <img
           src="${exercise.file}.jpg"
-          alt="${exercise.name}"
+          alt="${escapeHtml(exercise.name)}"
           onerror="tryNextExtension(this, '${exercise.file}', 0, ${fallbackNumber})"
         >
       `;
@@ -710,6 +660,35 @@
     function closeModalNow() {
       modal.classList.remove("open");
     }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    homeDayButtons.forEach((button) => {
+      button.addEventListener("click", () => chooseDay(Number(button.dataset.day)));
+    });
+
+    homeButton.addEventListener("click", showHome);
+
+    modeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        setMode(button.dataset.mode, button.dataset.mode === "posture" ? "left" : "right");
+      });
+    });
+
+    grid.addEventListener("click", (event) => {
+      const card = event.target.closest(".exercise");
+      if (!card) return;
+
+      const exercise = WORKOUTS[state.day][state.mode][Number(card.dataset.index)];
+      openModal(exercise, Number(card.dataset.index) + 1);
+    });
 
     closeModal.addEventListener("click", closeModalNow);
 
@@ -758,9 +737,7 @@
       if (event.key === "ArrowLeft") setMode("workout", "right");
     });
 
-    configPad.value = localStorage.getItem("gymConfigText") || buildConfigText();
-    applyConfigText(configPad.value);
+    loadWorkoutTextFile();
   </script>
 </body>
 </html>
-loadWorkoutTextFile();

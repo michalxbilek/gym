@@ -1,0 +1,57 @@
+Workout / Day:A / 1 / Goblet Squat / sets:3 / reps:10 / notes:Slow down, knees track toes
+Workout / Day:A / 2 / Romanian Deadlift / sets:3 / reps:10 / notes:Hips back, neutral back
+Workout / Day:A / 3 / Floor Press / sets:3 / reps:10 / notes:Elbows 45°
+Workout / Day:A / 4 / Bent-over Row / sets:3 / reps:10 / notes:Pull to ribs
+Workout / Day:A / 5 / Reverse Lunge / sets:3 / reps:8/side / notes:Tall torso
+Workout / Day:A / 6 / Shoulder Press / sets:3 / reps:10 / notes:Ribs down
+Workout / Day:A / 7 / Glute Bridge / sets:3 / reps:12 / notes:Squeeze at top
+Workout / Day:A / 8 / Plank Hold / sets:3 / reps:30s / notes:Long neck, tight core
+
+Posture / Day:A / 1 / Wall Angels / sets:2 / reps:10 / notes:Back against wall
+Posture / Day:A / 2 / Chin Tucks / sets:2 / reps:10 / notes:Tiny double chin
+Posture / Day:A / 3 / Thoracic Extension / sets:2 / reps:8 / notes:Upper back only
+Posture / Day:A / 4 / Doorway Pec Stretch / sets:2 / reps:30s / notes:Gentle chest opening
+Posture / Day:A / 5 / Cat Cow / sets:2 / reps:8 / notes:Move one vertebra at a time
+Posture / Day:A / 6 / Hip Flexor Stretch / sets:2 / reps:30s/side / notes:Tuck pelvis slightly
+Posture / Day:A / 7 / Dead Bug / sets:2 / reps:8/side / notes:Lower back stays down
+Posture / Day:A / 8 / Scapular Push-up / sets:2 / reps:10 / notes:Move shoulder blades
+
+
+
+Workout / Day:B / 1 / Push-up / sets:3 / reps:AMRAP / notes:Clean reps only
+Workout / Day:B / 2 / TRX Row / sets:3 / reps:10 / notes:Body straight
+Workout / Day:B / 3 / Jump Squat / sets:3 / reps:8 / notes:Land quiet
+Workout / Day:B / 4 / Renegade Row / sets:3 / reps:8/side / notes:Hips steady
+Workout / Day:B / 5 / Calf Raise / sets:3 / reps:15 / notes:Full range
+Workout / Day:B / 6 / Lateral Raise / sets:3 / reps:12 / notes:Soft elbows
+Workout / Day:B / 7 / Mountain Climber / sets:3 / reps:30s / notes:Shoulders over wrists
+Workout / Day:B / 8 / Burpee / sets:3 / reps:6 / notes:Controlled, not chaotic
+
+Posture / Day:B / 1 / Band Pull-apart / sets:2 / reps:12 / notes:Shoulders down
+Posture / Day:B / 2 / Face Pull / sets:2 / reps:12 / notes:Pull toward eyes
+Posture / Day:B / 3 / Wall Slides / sets:2 / reps:10 / notes:No rib flare
+Posture / Day:B / 4 / Child's Pose Reach / sets:2 / reps:30s / notes:Reach long
+Posture / Day:B / 5 / 90/90 Hip Switch / sets:2 / reps:8 / notes:Move slow
+Posture / Day:B / 6 / Couch Stretch / sets:2 / reps:30s/side / notes:Glute squeezed
+Posture / Day:B / 7 / Bird Dog / sets:2 / reps:8/side / notes:No twisting
+Posture / Day:B / 8 / Neck CARs / sets:2 / reps:5 / notes:Small smooth circles
+
+
+
+Workout / Day:C / 1 / Dumbbell Swing / sets:3 / reps:12 / notes:Hip hinge, not squat
+Workout / Day:C / 2 / Squat to Press / sets:3 / reps:10 / notes:Smooth drive up
+Workout / Day:C / 3 / TRX Fallout / sets:3 / reps:8 / notes:Abs locked
+Workout / Day:C / 4 / Single-leg Squat Assist / sets:3 / reps:8/side / notes:Use TRX lightly
+Workout / Day:C / 5 / Sumo Squat / sets:3 / reps:10 / notes:Knees out
+Workout / Day:C / 6 / TRX Face Pull / sets:3 / reps:12 / notes:Elbows high
+Workout / Day:C / 7 / TRX Mountain Climber / sets:3 / reps:30s / notes:Slow and sharp
+Workout / Day:C / 8 / Tricep Dip / sets:3 / reps:8 / notes:Shoulders away from ears
+
+Posture / Day:C / 1 / Open Book / sets:2 / reps:8/side / notes:Rotate upper back
+Posture / Day:C / 2 / Thread the Needle / sets:2 / reps:8/side / notes:Breathe into stretch
+Posture / Day:C / 3 / Prone Y Raise / sets:2 / reps:10 / notes:Thumbs up
+Posture / Day:C / 4 / Prone W Raise / sets:2 / reps:10 / notes:Squeeze shoulder blades
+Posture / Day:C / 5 / Hamstring Floss / sets:2 / reps:10/side / notes:Gentle movement
+Posture / Day:C / 6 / Ankle Rocks / sets:2 / reps:10/side / notes:Heel stays down
+Posture / Day:C / 7 / Side Plank / sets:2 / reps:20s/side / notes:Straight line
+Posture / Day:C / 8 / Breathing Reset / sets:1 / reps:2 min / notes:Slow nasal breathing

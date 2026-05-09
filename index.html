@@ -63,10 +63,13 @@
       display: grid;
       place-items: center;
       padding: 28px;
+      z-index: 10;
+      pointer-events: auto;
     }
 
     .home-screen.hidden {
       display: none;
+      pointer-events: none;
     }
 
     .home-inner {
@@ -109,11 +112,13 @@
 
     .workout-screen {
       display: none;
+      z-index: 1;
       pointer-events: none;
     }
 
     .workout-screen.active {
       display: block;
+      z-index: 20;
       pointer-events: auto;
     }
 
@@ -584,7 +589,7 @@
         const line = rawLine.trim();
         if (!line || line.startsWith("#")) return;
 
-        const parts = line.split("/").map((part) => part.trim());
+        const parts = line.split(" / ").map((part) => part.trim());
         if (parts.length < 6) return;
 
         const mode = parts[0].toLowerCase().includes("posture") ? "posture" : "workout";
@@ -674,8 +679,18 @@
         .replaceAll("'", "&#039;");
     }
 
+    window.chooseDay = chooseDay;
+    window.showHome = showHome;
+    window.tryNextExtension = tryNextExtension;
+
     homeDayButtons.forEach((button) => {
-      button.addEventListener("click", () => chooseDay(Number(button.dataset.day)));
+      const dayNumber = Number(button.dataset.day);
+      button.addEventListener("click", () => chooseDay(dayNumber));
+      button.addEventListener("pointerup", () => chooseDay(dayNumber));
+      button.addEventListener("touchend", (event) => {
+        event.preventDefault();
+        chooseDay(dayNumber);
+      }, { passive: false });
     });
 
     homeButton.addEventListener("click", showHome);

@@ -6,14 +6,6 @@
   <title>Gym ABC</title>
 
   <style>
-    :root {
-      --bg: #000000;
-      --text: #ffffff;
-      --muted: #8b8b8b;
-      --line: #222222;
-      --topbar-h: 56px;
-    }
-
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -24,63 +16,65 @@
       margin: 0;
       width: 100%;
       height: 100%;
-      background: #000000;
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #000;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      overflow: hidden;
       overscroll-behavior: none;
     }
 
     body {
       position: fixed;
       inset: 0;
-      overflow: hidden;
     }
 
     button {
       font: inherit;
-      color: inherit;
       border: 0;
+      color: inherit;
       background: none;
       cursor: pointer;
     }
 
-    .app {
-      position: relative;
+    #app {
+      position: fixed;
+      inset: 0;
       width: 100vw;
       height: 100dvh;
+      background: #000;
       overflow: hidden;
-      background: #000000;
-      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
     }
 
     .screen {
-      position: absolute;
-      inset: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
-      background: #000000;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      background: #000;
     }
 
-    .home-screen {
-      display: grid;
-      place-items: center;
+    #homeScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 28px;
       z-index: 10;
-      pointer-events: auto;
     }
 
-    .home-screen.hidden {
+    #homeScreen.hidden {
       display: none;
-      pointer-events: none;
     }
 
     .home-inner {
       width: min(100%, 380px);
-      display: grid;
-      gap: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
 
     .home-title {
-      margin: 0 0 12px;
-      color: var(--muted);
+      margin: 0 0 10px;
+      color: #888;
       font-size: 12px;
       font-weight: 800;
       letter-spacing: 0.18em;
@@ -88,38 +82,37 @@
       text-transform: uppercase;
     }
 
-    .home-day {
-      position: relative;
-      z-index: 10;
+    .day-button {
       width: 100%;
-      height: 76px;
-      border: 1px solid var(--line);
-      background: #000000;
-      color: #ffffff;
-      font-size: 34px;
-      line-height: 1;
+      height: 82px;
+      border: 1px solid #222;
+      background: #000;
+      color: #fff;
+      font-size: 38px;
       font-weight: 900;
-      letter-spacing: -0.05em;
+      line-height: 1;
     }
 
-    .config-help {
+    .day-button:active {
+      background: #fff;
+      color: #000;
+    }
+
+    .home-note {
       margin: 10px 0 0;
-      color: var(--muted);
+      color: #777;
       font-size: 11px;
       line-height: 1.35;
       text-align: center;
     }
 
-    .workout-screen {
+    #workoutScreen {
       display: none;
-      z-index: 1;
-      pointer-events: none;
+      z-index: 20;
     }
 
-    .workout-screen.active {
+    #workoutScreen.active {
       display: block;
-      z-index: 20;
-      pointer-events: auto;
     }
 
     .topbar {
@@ -127,131 +120,102 @@
       top: 0;
       left: 0;
       right: 0;
-      height: var(--topbar-h);
+      height: 56px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #000000;
-      border-bottom: 1px solid var(--line);
-      z-index: 5;
+      background: #000;
+      border-bottom: 1px solid #222;
+      z-index: 3;
+      padding-top: env(safe-area-inset-top);
+      box-sizing: content-box;
     }
 
     .home-button {
       position: absolute;
       left: 8px;
-      top: 50%;
+      top: calc(50% + env(safe-area-inset-top) / 2);
       transform: translateY(-50%);
-      width: 40px;
-      height: 40px;
-      display: grid;
-      place-items: center;
-      color: #ffffff;
-      font-size: 20px;
+      width: 44px;
+      height: 44px;
+      color: #fff;
+      font-size: 23px;
       font-weight: 900;
     }
 
     .mode-switcher {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       padding: 3px;
-      border: 1px solid var(--line);
+      border: 1px solid #222;
       border-radius: 999px;
-      background: #000000;
+      background: #000;
     }
 
-    .mode-btn {
+    .mode-button {
       height: 34px;
-      min-width: 78px;
-      padding: 0 12px;
+      min-width: 82px;
+      padding: 0 13px;
       border-radius: 999px;
-      color: var(--muted);
+      color: #888;
       font-size: 12px;
-      font-weight: 850;
+      font-weight: 900;
     }
 
-    .mode-btn.active {
-      background: #ffffff;
-      color: #000000;
+    .mode-button.active {
+      background: #fff;
+      color: #000;
     }
 
     .day-mark {
       position: absolute;
       right: 14px;
-      top: 50%;
+      top: calc(50% + env(safe-area-inset-top) / 2);
       transform: translateY(-50%);
-      color: var(--muted);
+      color: #888;
       font-size: 14px;
       font-weight: 900;
-      letter-spacing: -0.02em;
     }
 
-    .viewport {
+    #grid {
       position: absolute;
       left: 0;
       right: 0;
-      top: var(--topbar-h);
-      bottom: 0;
-      overflow: hidden;
-      background: #000000;
-    }
-
-    .grid {
-      position: absolute;
-      inset: 0;
+      top: calc(56px + env(safe-area-inset-top));
+      bottom: env(safe-area-inset-bottom);
       display: grid;
-      grid-template-columns: repeat(2, 50%);
-      grid-template-rows: repeat(4, 25%);
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(4, 1fr);
       gap: 0;
-      padding: 0;
-      background: #000000;
-      transition: transform 220ms ease, opacity 180ms ease;
-    }
-
-    .grid.anim-left-enter {
-      transform: translateX(18px);
-      opacity: 0;
-    }
-
-    .grid.anim-right-enter {
-      transform: translateX(-18px);
-      opacity: 0;
+      background: #000;
+      overflow: hidden;
     }
 
     .exercise {
       position: relative;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      border-radius: 0;
-      background: #000000;
-      isolation: isolate;
+      background: #000;
     }
 
-    .exercise:active {
-      transform: scale(0.985);
-    }
-
-    .exercise img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      background: #000000;
-    }
-
+    .exercise img,
     .placeholder {
       width: 100%;
       height: 100%;
+      display: block;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .placeholder {
       display: grid;
       place-items: center;
-      background: #000000;
-      border: 1px solid #141414;
-      color: #555555;
+      border: 1px solid #111;
+      color: #444;
       font-size: 34px;
       font-weight: 900;
-      letter-spacing: -0.06em;
     }
 
     .caption {
@@ -268,55 +232,32 @@
       display: block;
       font-size: clamp(22px, 6.5vw, 36px);
       line-height: 0.95;
-      font-weight: 850;
+      font-weight: 900;
       letter-spacing: -0.05em;
-      text-wrap: balance;
     }
 
     .meta {
       display: block;
       margin-top: 8px;
-      color: rgba(255,255,255,0.82);
+      color: rgba(255, 255, 255, 0.82);
       font-size: clamp(18px, 5.2vw, 30px);
       line-height: 1;
       font-weight: 800;
       letter-spacing: -0.03em;
     }
 
-    .hint {
-      position: absolute;
-      left: 50%;
-      bottom: calc(env(safe-area-inset-bottom) + 8px);
-      transform: translateX(-50%);
-      color: rgba(255,255,255,0.35);
-      font-size: 10px;
-      font-weight: 650;
-      letter-spacing: 0.02em;
-      z-index: 4;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      animation: hintFade 4s ease forwards;
-    }
-
-    @keyframes hintFade {
-      0%, 15% { opacity: 0; }
-      30%, 70% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-
-    .modal {
+    #modal {
       position: fixed;
       inset: 0;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 18px;
-      background: rgba(0,0,0,0.92);
-      z-index: 20;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 50;
     }
 
-    .modal.open {
+    #modal.open {
       display: flex;
     }
 
@@ -324,20 +265,18 @@
       width: min(100%, 430px);
     }
 
-    .modal-media {
+    #modalMedia {
       width: 100%;
       aspect-ratio: 1 / 1;
       overflow: hidden;
-      border-radius: 0;
-      background: #000000;
-      border: 0;
+      background: #000;
     }
 
-    .modal-media img,
-    .modal-media .placeholder {
+    #modalMedia img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
     .modal-info {
@@ -352,7 +291,7 @@
 
     .modal-info p {
       margin: 6px 0 0;
-      color: var(--muted);
+      color: #888;
       font-size: 14px;
       line-height: 1.4;
     }
@@ -364,55 +303,61 @@
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.12);
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
       font-size: 24px;
       line-height: 1;
+      z-index: 60;
     }
 
     @media (min-width: 560px) {
-      .app {
+      #app {
+        left: 50%;
         width: 430px;
-        margin: 0 auto;
-        border-left: 1px solid var(--line);
-        border-right: 1px solid var(--line);
+        transform: translateX(-50%);
+        border-left: 1px solid #222;
+        border-right: 1px solid #222;
+      }
+
+      .screen {
+        left: 50%;
+        width: 430px;
+        transform: translateX(-50%);
       }
     }
   </style>
 </head>
 
 <body>
-  <main class="app" id="app" aria-live="polite">
-    <section class="screen home-screen" id="homeScreen">
+  <main id="app">
+    <section id="homeScreen" class="screen">
       <div class="home-inner">
         <p class="home-title">Choose day</p>
-        <button class="home-day" data-day="0" type="button" onclick="chooseDay(0)">A</button>
-        <button class="home-day" data-day="1" type="button" onclick="chooseDay(1)">B</button>
-        <button class="home-day" data-day="2" type="button" onclick="chooseDay(2)">C</button>
-        <p class="config-help">Edit workouts.txt on GitHub to change names, sets and reps.</p>
+        <button class="day-button" type="button" data-day="0">A</button>
+        <button class="day-button" type="button" data-day="1">B</button>
+        <button class="day-button" type="button" data-day="2">C</button>
+        <p class="home-note">Edit workouts.txt on GitHub to change names, sets and reps.</p>
       </div>
     </section>
 
-    <section class="screen workout-screen" id="workoutScreen">
+    <section id="workoutScreen" class="screen">
       <header class="topbar">
-        <button class="home-button" id="homeButton" type="button" aria-label="Back to day selector" onclick="showHome()">⌂</button>
-        <div class="mode-switcher" aria-label="Choose type">
-          <button class="mode-btn active" data-mode="workout" type="button">Gym</button>
-          <button class="mode-btn" data-mode="posture" type="button">Posture</button>
+        <button class="home-button" id="homeButton" type="button" aria-label="Home">⌂</button>
+        <div class="mode-switcher">
+          <button class="mode-button active" type="button" data-mode="workout">Gym</button>
+          <button class="mode-button" type="button" data-mode="posture">Posture</button>
         </div>
         <div class="day-mark" id="dayMark">A</div>
       </header>
 
-      <section class="viewport" id="viewport">
-        <div class="grid" id="grid"></div>
-        <div class="hint">swipe ← → for gym/posture · ⌂ for days</div>
-      </section>
+      <section id="grid"></section>
     </section>
   </main>
 
-  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <button class="close" id="closeModal" type="button" aria-label="Close">×</button>
+  <div id="modal">
+    <button class="close" id="closeModal" type="button">×</button>
     <div class="modal-card">
-      <div class="modal-media" id="modalMedia"></div>
+      <div id="modalMedia"></div>
       <div class="modal-info">
         <h2 id="modalTitle"></h2>
         <p id="modalMeta"></p>
@@ -425,7 +370,6 @@
 
     const WORKOUTS = [
       {
-        id: "a",
         title: "A",
         workout: [
           { name: "Goblet Squat", file: "images/a/aw1", sets: 3, reps: "10", notes: "Slow down, knees track toes" },
@@ -449,7 +393,6 @@
         ]
       },
       {
-        id: "b",
         title: "B",
         workout: [
           { name: "Push-up", file: "images/b/bw1", sets: 3, reps: "AMRAP", notes: "Clean reps only" },
@@ -473,7 +416,6 @@
         ]
       },
       {
-        id: "c",
         title: "C",
         workout: [
           { name: "Dumbbell Swing", file: "images/c/cw1", sets: 3, reps: "12", notes: "Hip hinge, not squat" },
@@ -498,82 +440,80 @@
       }
     ];
 
-    const state = {
-      screen: "home",
-      day: 0,
-      mode: "workout"
-    };
+    let currentScreen = "home";
+    let currentDay = 0;
+    let currentMode = "workout";
 
-    const app = document.getElementById("app");
     const homeScreen = document.getElementById("homeScreen");
     const workoutScreen = document.getElementById("workoutScreen");
     const grid = document.getElementById("grid");
-    const homeButton = document.getElementById("homeButton");
     const dayMark = document.getElementById("dayMark");
-    const homeDayButtons = [...document.querySelectorAll(".home-day")];
-    const modeButtons = [...document.querySelectorAll(".mode-btn")];
     const modal = document.getElementById("modal");
     const modalMedia = document.getElementById("modalMedia");
     const modalTitle = document.getElementById("modalTitle");
     const modalMeta = document.getElementById("modalMeta");
-    const closeModal = document.getElementById("closeModal");
 
-    function render(animationClass = "") {
-      if (state.screen === "home") {
-        homeScreen.classList.remove("hidden");
-        workoutScreen.classList.remove("active");
-        return;
-      }
+    function showHome() {
+      currentScreen = "home";
+      modal.classList.remove("open");
+      homeScreen.classList.remove("hidden");
+      workoutScreen.classList.remove("active");
+    }
 
+    function chooseDay(dayIndex) {
+      currentScreen = "workout";
+      currentDay = dayIndex;
+      currentMode = "workout";
       homeScreen.classList.add("hidden");
       workoutScreen.classList.add("active");
-
-      const currentDay = WORKOUTS[state.day];
-      const exercises = currentDay[state.mode];
-      dayMark.textContent = currentDay.title;
-
-      modeButtons.forEach((button) => {
-        button.classList.toggle("active", button.dataset.mode === state.mode);
-      });
-
-      grid.className = `grid ${animationClass}`.trim();
-      grid.innerHTML = exercises.map((exercise, index) => cardTemplate(exercise, index)).join("");
-
-      requestAnimationFrame(() => {
-        grid.className = "grid";
-      });
+      renderWorkout();
     }
 
-    function cardTemplate(exercise, index) {
-      return `
-        <article class="exercise" data-index="${index}">
-          <img
-            src="${exercise.file}.jpg"
-            alt="${escapeHtml(exercise.name)}"
-            loading="eager"
-            onerror="tryNextExtension(this, '${exercise.file}', 0, ${index + 1})"
-          >
-          <div class="caption">
-            <span class="name">${escapeHtml(exercise.name)}</span>
-            <span class="meta">${escapeHtml(formatDose(exercise))}</span>
-          </div>
-        </article>
-      `;
+    function setMode(mode) {
+      if (currentScreen !== "workout") return;
+      currentMode = mode;
+      renderWorkout();
     }
 
-    function tryNextExtension(img, fileBase, currentIndex, fallbackNumber) {
-      const nextIndex = currentIndex + 1;
+    function renderWorkout() {
+      const day = WORKOUTS[currentDay];
+      const exercises = day[currentMode];
+
+      dayMark.textContent = day.title;
+
+      document.querySelectorAll(".mode-button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.mode === currentMode);
+      });
+
+      grid.innerHTML = exercises.map((exercise, index) => {
+        const src = `${exercise.file}.jpg`;
+        return `
+          <article class="exercise" data-index="${index}">
+            <img src="${src}" alt="${html(exercise.name)}" loading="eager" onerror="tryImageExtension(this, '${exercise.file}', 0, ${index + 1})">
+            <div class="caption">
+              <span class="name">${html(exercise.name)}</span>
+              <span class="meta">${html(formatDose(exercise))}</span>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function tryImageExtension(img, fileBase, extensionIndex, fallbackNumber) {
+      const nextIndex = extensionIndex + 1;
 
       if (nextIndex < EXTENSIONS.length) {
-        img.onerror = () => tryNextExtension(img, fileBase, nextIndex, fallbackNumber);
+        img.onerror = function () {
+          tryImageExtension(img, fileBase, nextIndex, fallbackNumber);
+        };
         img.src = `${fileBase}.${EXTENSIONS[nextIndex]}`;
         return;
       }
 
-      const placeholder = document.createElement("div");
-      placeholder.className = "placeholder";
-      placeholder.textContent = fallbackNumber;
-      img.replaceWith(placeholder);
+      const fallback = document.createElement("div");
+      fallback.className = "placeholder";
+      fallback.textContent = fallbackNumber;
+      img.replaceWith(fallback);
     }
 
     function formatDose(exercise) {
@@ -583,9 +523,10 @@
       return `${exercise.sets}×${exercise.reps}`;
     }
 
-    function applyConfigText(text) {
-      text.split("
-").forEach((rawLine) => {
+    function applyWorkoutText(text) {
+      const lines = text.split(/\r?\n/);
+
+      lines.forEach((rawLine) => {
         const line = rawLine.trim();
         if (!line || line.startsWith("#")) return;
 
@@ -593,9 +534,11 @@
         if (parts.length < 6) return;
 
         const mode = parts[0].toLowerCase().includes("posture") ? "posture" : "workout";
-        const dayMatch = parts[1].match(/[ABC]/i);
-        const dayIndex = dayMatch ? "abc".indexOf(dayMatch[0].toLowerCase()) : -1;
-        const exerciseIndex = Number.parseInt(parts[2], 10) - 1;
+        const dayLetterMatch = parts[1].match(/[ABC]/i);
+        if (!dayLetterMatch) return;
+
+        const dayIndex = "abc".indexOf(dayLetterMatch[0].toLowerCase());
+        const exerciseIndex = parseInt(parts[2], 10) - 1;
         const name = parts[3];
 
         if (!WORKOUTS[dayIndex] || !WORKOUTS[dayIndex][mode] || !WORKOUTS[dayIndex][mode][exerciseIndex]) return;
@@ -604,100 +547,59 @@
         exercise.name = name;
 
         parts.slice(4).forEach((field) => {
-          const [key, ...valueParts] = field.split(":");
-          if (!key || valueParts.length === 0) return;
+          const colonIndex = field.indexOf(":");
+          if (colonIndex === -1) return;
 
-          const keyClean = key.trim().toLowerCase();
-          const value = valueParts.join(":").trim();
+          const key = field.slice(0, colonIndex).trim().toLowerCase();
+          const value = field.slice(colonIndex + 1).trim();
 
-          if (keyClean === "sets") exercise.sets = Number.isNaN(Number(value)) ? value : Number(value);
-          if (keyClean === "reps") exercise.reps = value;
-          if (keyClean === "notes") exercise.notes = value;
+          if (key === "sets") exercise.sets = isNaN(Number(value)) ? value : Number(value);
+          if (key === "reps") exercise.reps = value;
+          if (key === "notes") exercise.notes = value;
         });
       });
 
-      render();
+      if (currentScreen === "workout") renderWorkout();
     }
 
-    async function loadWorkoutTextFile() {
+    async function loadWorkoutsTxt() {
       try {
         const response = await fetch(`workouts.txt?v=${Date.now()}`);
-        if (!response.ok) {
-          render();
-          return;
-        }
-
+        if (!response.ok) return;
         const text = await response.text();
-        applyConfigText(text);
+        applyWorkoutText(text);
       } catch (error) {
-        render();
+        console.log("Could not load workouts.txt", error);
       }
-    }
-
-    function showHome() {
-      state.screen = "home";
-      closeModalNow();
-      render();
-    }
-
-    function chooseDay(dayIndex) {
-      state.screen = "workout";
-      state.day = dayIndex;
-      state.mode = "workout";
-      render();
-    }
-
-    function setMode(nextMode, direction) {
-      if (nextMode === state.mode) return;
-      state.mode = nextMode;
-      render(direction === "left" ? "anim-left-enter" : "anim-right-enter");
     }
 
     function openModal(exercise, fallbackNumber) {
       modalTitle.textContent = exercise.name;
       modalMeta.textContent = `${formatDose(exercise)}${exercise.notes ? " · " + exercise.notes : ""}`;
-      modalMedia.innerHTML = `
-        <img
-          src="${exercise.file}.jpg"
-          alt="${escapeHtml(exercise.name)}"
-          onerror="tryNextExtension(this, '${exercise.file}', 0, ${fallbackNumber})"
-        >
-      `;
+      modalMedia.innerHTML = `<img src="${exercise.file}.jpg" alt="${html(exercise.name)}" onerror="tryImageExtension(this, '${exercise.file}', 0, ${fallbackNumber})">`;
       modal.classList.add("open");
     }
 
-    function closeModalNow() {
-      modal.classList.remove("open");
-    }
-
-    function escapeHtml(value) {
+    function html(value) {
       return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    window.chooseDay = chooseDay;
-    window.showHome = showHome;
-    window.tryNextExtension = tryNextExtension;
-
-    homeDayButtons.forEach((button) => {
-      const dayNumber = Number(button.dataset.day);
-      button.addEventListener("click", () => chooseDay(dayNumber));
-      button.addEventListener("pointerup", () => chooseDay(dayNumber));
-      button.addEventListener("touchend", (event) => {
-        event.preventDefault();
-        chooseDay(dayNumber);
-      }, { passive: false });
+    document.querySelectorAll(".day-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        chooseDay(Number(button.dataset.day));
+      });
     });
 
-    homeButton.addEventListener("click", showHome);
+    document.getElementById("homeButton").addEventListener("click", showHome);
 
-    modeButtons.forEach((button) => {
+    document.querySelectorAll(".mode-button").forEach((button) => {
       button.addEventListener("click", () => {
-        setMode(button.dataset.mode, button.dataset.mode === "posture" ? "left" : "right");
+        setMode(button.dataset.mode);
       });
     });
 
@@ -705,58 +607,56 @@
       const card = event.target.closest(".exercise");
       if (!card) return;
 
-      const exercise = WORKOUTS[state.day][state.mode][Number(card.dataset.index)];
+      const exercise = WORKOUTS[currentDay][currentMode][Number(card.dataset.index)];
       openModal(exercise, Number(card.dataset.index) + 1);
     });
 
-    closeModal.addEventListener("click", closeModalNow);
-
-    modal.addEventListener("click", (event) => {
-      if (event.target === modal) closeModalNow();
+    document.getElementById("closeModal").addEventListener("click", () => {
+      modal.classList.remove("open");
     });
 
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchStartTime = 0;
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) modal.classList.remove("open");
+    });
 
-    app.addEventListener("touchstart", (event) => {
+    let startX = 0;
+    let startY = 0;
+    let startTime = 0;
+
+    document.addEventListener("touchstart", (event) => {
       const touch = event.changedTouches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      touchStartTime = Date.now();
+      startX = touch.clientX;
+      startY = touch.clientY;
+      startTime = Date.now();
     }, { passive: true });
 
-    app.addEventListener("touchend", (event) => {
-      if (state.screen !== "workout") return;
+    document.addEventListener("touchend", (event) => {
+      if (currentScreen !== "workout") return;
       if (modal.classList.contains("open")) return;
 
       const touch = event.changedTouches[0];
-      const dx = touch.clientX - touchStartX;
-      const dy = touch.clientY - touchStartY;
-      const elapsed = Date.now() - touchStartTime;
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+      const elapsed = Date.now() - startTime;
 
-      const minDistance = 46;
-      const maxTime = 700;
+      if (elapsed > 700) return;
+      if (Math.abs(dx) < 46) return;
+      if (Math.abs(dx) < Math.abs(dy)) return;
 
-      if (elapsed > maxTime) return;
-
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > minDistance) {
-        if (dx < 0) setMode("posture", "left");
-        else setMode("workout", "right");
-      }
+      if (dx < 0) setMode("posture");
+      else setMode("workout");
     }, { passive: true });
 
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeModalNow();
+      if (event.key === "Escape") modal.classList.remove("open");
       if (event.key === "Home") showHome();
-
-      if (state.screen !== "workout") return;
-
-      if (event.key === "ArrowRight") setMode("posture", "left");
-      if (event.key === "ArrowLeft") setMode("workout", "right");
+      if (currentScreen !== "workout") return;
+      if (event.key === "ArrowRight") setMode("posture");
+      if (event.key === "ArrowLeft") setMode("workout");
     });
 
-    loadWorkoutTextFile();
+    showHome();
+    loadWorkoutsTxt();
   </script>
 </body>
 </html>

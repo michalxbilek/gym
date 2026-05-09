@@ -86,6 +86,8 @@
     }
 
     .home-day {
+      position: relative;
+      z-index: 10;
       width: 100%;
       height: 76px;
       border: 1px solid var(--line);
@@ -107,10 +109,12 @@
 
     .workout-screen {
       display: none;
+      pointer-events: none;
     }
 
     .workout-screen.active {
       display: block;
+      pointer-events: auto;
     }
 
     .topbar {
@@ -376,16 +380,16 @@
     <section class="screen home-screen" id="homeScreen">
       <div class="home-inner">
         <p class="home-title">Choose day</p>
-        <button class="home-day" data-day="0" type="button">A</button>
-        <button class="home-day" data-day="1" type="button">B</button>
-        <button class="home-day" data-day="2" type="button">C</button>
+        <button class="home-day" data-day="0" type="button" onclick="chooseDay(0)">A</button>
+        <button class="home-day" data-day="1" type="button" onclick="chooseDay(1)">B</button>
+        <button class="home-day" data-day="2" type="button" onclick="chooseDay(2)">C</button>
         <p class="config-help">Edit workouts.txt on GitHub to change names, sets and reps.</p>
       </div>
     </section>
 
     <section class="screen workout-screen" id="workoutScreen">
       <header class="topbar">
-        <button class="home-button" id="homeButton" type="button" aria-label="Back to day selector">⌂</button>
+        <button class="home-button" id="homeButton" type="button" aria-label="Back to day selector" onclick="showHome()">⌂</button>
         <div class="mode-switcher" aria-label="Choose type">
           <button class="mode-btn active" data-mode="workout" type="button">Gym</button>
           <button class="mode-btn" data-mode="posture" type="button">Posture</button>
